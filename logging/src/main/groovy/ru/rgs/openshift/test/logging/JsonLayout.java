@@ -17,7 +17,7 @@ import org.slf4j.MDC;
 
 /**
  * @author jihor (dmitriy_zhikharev@rgs.ru)
- *         (С) RGS Group, http://www.rgs.ru
+ *         (C) RGS Group, http://www.rgs.ru
  *         Created on 2016-06-07
  */
 
