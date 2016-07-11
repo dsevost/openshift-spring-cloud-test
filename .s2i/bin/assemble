@@ -1,4 +1,6 @@
 #!/bin/bash -e
+
+set -x 
 #
 # S2I assemble script for the 'springboot-s2i' image.
 # The 'assemble' script builds your application source ready to run.
