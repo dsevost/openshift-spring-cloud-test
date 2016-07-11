@@ -7,4 +7,4 @@
 # For more information see the documentation:
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
-#tar czf - /home/jboss/.m2 /home/jboss/.gradle
+tar czf - /home/jboss/.m2 /home/jboss/.gradle

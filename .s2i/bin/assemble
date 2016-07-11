@@ -17,4 +17,6 @@ function check_build() {
   echo "$FUNCNAME: overloaded"
 }
 
+ls -la $HOME/.gradle/*
+
 source $S2I_PATH/assemble
