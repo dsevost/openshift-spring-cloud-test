@@ -24,7 +24,7 @@ function restore_artifacts() {
     echo "---> Restoring build artifacts"
 #    pwd
 #    ls -laZ /tmp/artifacts
-    tar -C /tmp/artifacts -cvf - . | tar --no-overwrite-dir -C / -xf -
+    tar -C /tmp/artifacts -cf - . | tar --no-overwrite-dir -C / -xf -
   fi
 }
 
