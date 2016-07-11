@@ -7,9 +7,5 @@
 # For more information see the documentation:
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
-SAVES=""
-for d in .m2 .gradle ; do
-    [ -rd /home/jboss/$d ] && SAVES="$SAVES $d"
-done
 
-tar -C /home/jboss -cf - $SAVES
+tar -C /home/jboss -cf - .m2 .gradle
