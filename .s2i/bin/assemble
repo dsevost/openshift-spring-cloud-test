@@ -9,7 +9,7 @@ set -x
 # https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 source $S2I_PATH/common.sh
 
@@ -22,9 +22,9 @@ function restore_artifacts() {
 
   if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
     echo "---> Restoring build artifacts"
-    pwd
-    ls -laZ /tmp/artifacts
-    ( tar -C /tmp/artifacts -cvf - . | tar --no-overwrite-dir -C / -xf - ) || true
+#    pwd
+#    ls -laZ /tmp/artifacts
+    tar -C /tmp/artifacts -cvf - . | tar --no-overwrite-dir -C / -xf -
   fi
 }
 
