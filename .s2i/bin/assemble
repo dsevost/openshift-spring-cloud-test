@@ -17,6 +17,10 @@ function check_build() {
   echo "$FUNCNAME: overloaded"
 }
 
+for d in .m2 .gradle ; do
+    mkdir -p $HOME/$d || /bin/true
+done
+
 ls -la $HOME/.gradle/* || /bin/true
 
 source $S2I_PATH/assemble
