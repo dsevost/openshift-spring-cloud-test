@@ -1,8 +1,8 @@
-FROM docstore.rgs.ru:5000/centos-java:latest
-MAINTAINER "jihor"
+FROM rgs/java
+MAINTAINER dsevosty@redhat.com
 
 # add jar
-ADD frontend-service.jar /
+ADD build/frontend-service.jar /
 
 # expose ports
 EXPOSE 8080
