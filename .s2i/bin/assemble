@@ -7,29 +7,8 @@
 # https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-if [ "$1" = "-h" ]; then
-  # If the 'springboot-s2i' assemble script is executed with '-h' flag,
-  # print the usage.
-  exec /usr/local/s2i/usage
-fi
+function check_build() {
+  echo "Overloading $FUNCNAME"
+}
 
-source /usr/local/s2i/common.sh
-
-copy_sources_from /tmp/src
-
-if [ -f "$LOCAL_SOURCE_DIR/pom.xml" ]; then
-  build_maven_project
-elif [ -f "$LOCAL_SOURCE_DIR/build.gradle" ]; then
-  build_gradle_project
-fi
-
-# Copy (probably binary) artifacts from the deployments/
-# directory to the $DEPLOY_DIR directory for later deployment
-# copy_artifacts "deployments"
-
-# if [ -d $LOCAL_SOURCE_DIR/configuration ]; then
-#   echo "Copying config files from project..."
-#   cp -v $LOCAL_SOURCE_DIR/configuration/* $ARTIFACTS_HOME
-# fi
-
-#check_build
+exec $S2I_PATH/assemble
