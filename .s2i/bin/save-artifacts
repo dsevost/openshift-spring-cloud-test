@@ -12,4 +12,4 @@
 #    mkdir -p /home/jboss/$d 1>/dev/null 2>&1 || /bin/true
 #done
 
-tar -C /home/jboss cf - .m2 .gradle
+tar -C /home/jboss -cf - .m2 .gradle
