@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#set -x 
+set -x 
 #
 # S2I assemble script for the 'springboot-s2i' image.
 # The 'assemble' script builds your application source ready to run.
@@ -29,3 +29,10 @@ function restore_artifacts() {
 }
 
 source $S2I_PATH/assemble
+
+echo "Cleaning /tmp"
+mount | grep '/tmp/src' || rm -rf /tmp/src
+mount | grep '/tmp/artifacts' || rm -rf /tmp/artifacts
+
+echo "Cleaning /opt/app-root/src/"
+rm -rf /opt/app-root/src/*
