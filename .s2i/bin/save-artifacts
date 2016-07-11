@@ -8,4 +8,4 @@
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-tar -C /home/jboss -cf - .m2 .gradle
+tar -cf - /home/jboss
