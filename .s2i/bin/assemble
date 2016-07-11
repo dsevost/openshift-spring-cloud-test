@@ -7,9 +7,6 @@
 # https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-exit 1
-
 if [ "$1" = "-h" ]; then
   # If the 'springboot-s2i' assemble script is executed with '-h' flag,
   # print the usage.
