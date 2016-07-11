@@ -7,8 +7,10 @@
 # https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
+source $S2I_PATH/common.sh
+
 function check_build() {
-  echo "Overloading $FUNCNAME"
+  echo "$FUNCNAME: overloaded"
 }
 
-exec $S2I_PATH/assemble
+source $S2I_PATH/assemble
