@@ -22,7 +22,7 @@ function restore_artifacts() {
     echo "---> Restoring build artifacts"
 #    pwd
 #    ls -laZ /tmp/artifacts
-    tar -C /tmp/artifacts/home/jboss -cf - . | tar -C /home/jboss -xf -
+    tar -C /tmp/artifacts -cf - . | tar -C /home/jboss -xf -
   fi
 }
 
