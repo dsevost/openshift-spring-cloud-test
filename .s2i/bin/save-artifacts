@@ -8,8 +8,8 @@
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-for d in .m2 .gradle ; do
-    mkdir -p /home/jboss/$d 1>/dev/null 2>&1 || /bin/true
-done
+#for d in .m2 .gradle ; do
+#    mkdir -p /home/jboss/$d 1>/dev/null 2>&1 || /bin/true
+#done
 
-tar cf - /home/jboss/.m2 /home/jboss/.gradle
+tar -C /home/jboss cf - .m2 .gradle
