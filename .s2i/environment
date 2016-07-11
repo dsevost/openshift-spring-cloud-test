@@ -1,5 +1,5 @@
 # Source code provided to STI is at ${HOME}/source
-APP_HOME=${APP_HOME:-/opt/app-root/src}
+APP_HOME=/opt/app-root/src
 LOCAL_SOURCE_DIR=${APP_HOME}/source
 DEPLOY_DIR=${DEPLOY_DIR:-/opt/openshift}
 
