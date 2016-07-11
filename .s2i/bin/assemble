@@ -21,8 +21,8 @@ function restore_artifacts() {
   if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
     echo "---> Restoring build artifacts"
     pwd
-    ls -la /tmp/artifacts
-    mv /tmp/artifacts/* ./
+    ls -laZ /tmp/artifacts
+    tar -C /tmp/artifacts -cf - | tar -C / -xf -
   fi
 }
 
