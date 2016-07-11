@@ -7,5 +7,4 @@
 # For more information see the documentation:
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
-
-tar -cf - /home/jboss
+tar cf - /home/jboss

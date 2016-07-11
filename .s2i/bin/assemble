@@ -20,8 +20,8 @@ function check_build() {
 function restore_artifacts() {
   if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
     echo "---> Restoring build artifacts"
-#    pwd
-#    ls -laZ /tmp/artifacts
+    pwd
+    ls -laZ /tmp/artifacts
     tar -C /tmp/artifacts -cvf - . | tar -C / -xf -
   fi
 }
