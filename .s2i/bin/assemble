@@ -18,11 +18,13 @@ function check_build() {
 }
 
 function restore_artifacts() {
+  echo "$FUNCNAME: overloaded"
+
   if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
     echo "---> Restoring build artifacts"
     pwd
     ls -laZ /tmp/artifacts
-    tar -C /tmp/artifacts -cvf - . | tar -C / -xf -
+    ( tar -C /tmp/artifacts -cvf - . | tar -C / -xf - ) || true
   fi
 }
 
