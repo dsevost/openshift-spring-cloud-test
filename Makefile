@@ -35,23 +35,27 @@ list-targets:
 
 clean-back-a: # remove backend-service-a application resources
 	oc delete -l app=$(BACKEND_A_APP) all
-	oc delete pvc -l app=$(BACKEND_A_APP)
+	oc delete -l app=$(BACKEND_A_APP) pvc
 
 clean-back-b: # remove backend-service-b application resources
 	oc delete -l app=$(BACKEND_B_APP) all
-	oc delete pvc -l app=$(BACKEND_B_APP)
+	oc delete -l app=$(BACKEND_B_APP) pvc
 
 clean-consul: # remove consul application resources
 	oc delete -l app=$(CONSUL_APP) all
+	oc delete -l app=$(CONSUL_APP) pvc
 
 clean-front: # remove frontend-service application resources
 	oc delete -l app=$(FRONTEND_APP) all
+	oc delete -l app=$(FRONTEND_APP) pvc
 
 clean-redis: # remove redis application resources
 	oc delete -l app=$(REDIS_APP) all
+	oc delete -l app=$(REDIS_APP) pvc
 
 clean-splunk: # remove redis application resources
 	oc delete -l app=$(SPLUNK_APP) all
+	oc delete -l app=$(SPLUNK_APP) pvc
 
 s2i:
 	s2i \
@@ -90,7 +94,8 @@ os-splunk-app-create: # create new application (SPLUNK) based on outcoldman/splu
 		--claim-name=splunk-volume-2 \
 		--name=splunk-volume-2
 	oc label pvc splunk-volume-2 app=$(SPLUNK_APP)
-	oc expose service $(SPLUNK_APP) --port=8080 --hostname=$(SPLUNK_APP).$(APP_DOMAIN)
+	oc expose service $(SPLUNK_APP) --hostname=$(SPLUNK_APP).$(APP_DOMAIN)
+	oc patch route $(SPLUNK_APP) -p '{ "spec": { "port": { "targetPort": "8000-tcp" } } }'
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@echo "Please path $(SPLUNK_APP) to run in privileged mode" 
 
@@ -125,7 +130,7 @@ os-consul-app-create: # create new application (consul)
 		--overwrite \
 		--claim-size=$(TINY_1_VOL_SIZE) \
 		-t persistentVolumeClaim \
-		--claim-name=redis-volume-1 \
+		--claim-name=consul-volume-1 \
 		--name=consul-volume-1
 	oc label pvc consul-volume-1 app=$(CONSUL_APP)
 
@@ -165,7 +170,6 @@ os-backend-b-app-create: # create new application (backend-b)
 	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(BACKEND_B_APP) \
 	    $(PROJECT_SOURRCE) \
-	    -i os-backend-b-app-create-dummy0 \
 	    --context-dir=backend-service \
 	    -e SPRING_APPLICATION_NAME=$(BACKEND_B_APP) \
 	    -e SPRING_CLOUD_CONSUL_HOST=$(CONSUL_APP) \
@@ -182,7 +186,7 @@ os-backend-b-app-create: # create new application (backend-b)
 	    -e LOGGING_SPLUNK_PORT=8088 \
 	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
 	    -e LOGGING_TECH_INDEX_NAME=acme \
-		|| { grep -i 'error: imagestreams .* already exists' && /bin/true }
+		|| /bin/true
 	oc -n $(OS_PROJECT_NAME) \
 	    volume dc/$(BACKEND_B_APP) \
 		--add \
@@ -195,10 +199,10 @@ os-backend-b-app-create: # create new application (backend-b)
 	oc label pvc backend-service-b-1 app=$(BACKEND_B_APP)
 
 os-frontend-app-create: # create new application (frontend-b)
-	echo oc -n $(OS_PROJECT_NAME) new-app \
+	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(FRONTEND_APP) \
 	    $(PROJECT_SOURRCE) \
-	    --context-dir=backend-service \
+	    --context-dir=frontend-service \
 	    -e SPRING_APPLICATION_NAME=$(FRONTEND_APP) \
 	    -e SPRING_CLOUD_CONSUL_HOST=$(CONSUL_APP) \
 	    -e CACHING_REDIS_HOST=redis \
@@ -215,7 +219,8 @@ os-frontend-app-create: # create new application (frontend-b)
 	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
 	    -e LOGGING_SPLUNK_PORT=8088 \
 	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
-	    -e LOGGING_TECH_INDEX_NAME=acme
+	    -e LOGGING_TECH_INDEX_NAME=acme \
+		|| /bin/true
 	oc -n $(OS_PROJECT_NAME) \
 	    volume dc/$(FRONTEND_APP) \
 		--add \
@@ -226,3 +231,5 @@ os-frontend-app-create: # create new application (frontend-b)
 		--claim-name=frontend-service-1 \
 		--name=frontend-service-1
 	oc label pvc frontend-service-1 app=$(FRONTEND_APP)
+	oc expose service $(FRONTEND_APP) --hostname=$(FRONTEND_APP).$(APP_DOMAIN)
+	oc patch route $(FRONTEND_APP) -p '{ "spec": { "path": "/hello/" } }'
