@@ -19,6 +19,14 @@ REDIS_APP := redis
 SPLUNK_APP := splunk
 SPLUNK_TOKEN := DA044211-D1E3-45F5-8025-36311DA590C3
 
+TINY_1_VOL_SIZE=100Mi
+SMALL_1_VOL_SIZE=512Mi
+SMALL_2_VOL_SIZE=1Gi
+MEDIUM_1_VOL_SIZE=3Gi
+MEDIUM_2_VOL_SIZE=6Gi
+LARGE_1_VOL_SIZE=10Gi
+LARGE_2_VOL_SIZE=20Gi
+
 all: list-targets
 list-targets:
 	@echo
@@ -61,7 +69,7 @@ os-create-project: # switch (or create) openshift project
 	oc project $(OS_PROJECT_NAME) || oc new-project $(OS_PROJECT_NAME)
 	oc status
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	@echo "Adding default service account to privileged SCC (SPLUNK requires root privileges to be running)"
+	@echo "Adding default service account to privileged SCC (SPLUNK and CONSUL require root privileges to be running)"
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	oadm policy add-scc-to-user privileged system:serviceaccount:$(OS_PROJECT_NAME):default
 
@@ -75,10 +83,10 @@ os-splunk-app-create: # create new application (SPLUNK) based on outcoldman/splu
 	    volume dc/$(SPLUNK_APP) \
 		--add \
 		--overwrite \
-		--claim-size='10Gi' \
+		--claim-size=$(LARGE_1_VOL_SIZE) \
 		-t persistentVolumeClaim \
+		--claim-name=splunk-volume-2 \
 		--name=splunk-volume-2
-
 	oc expose service $(SPLUNK_APP) --port=8080 --hostname=$(SPLUNK_APP).$(APP_DOMAIN)
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@echo "Please path $(SPLUNK_APP) to run in privileged mode" 
@@ -96,16 +104,25 @@ os-redis-app-create: # create new application (redis) based on offical redis doc
 	    volume dc/$(REDIS_APP) \
 		--add \
 		--overwrite \
-		--claim-size='100Mi' \
+		--claim-size=$(TINY_1_VOL_SIZE) \
 		-t persistentVolumeClaim \
+		--claim-name=redis-volume-1 \
 		--name=redis-volume-1
 
 os-consul-app-create: # create new application (consul)
 	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(CONSUL_APP) \
 	    corporate-docker-registry.rgs.cinimex.ru:5000/rgs/consul
-q	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@echo "Please path $(CONSUL_APP) to run in privileged mode" 
+	oc -n $(OS_PROJECT_NAME) \
+	    volume dc/$(CONSUL_APP) \
+		--add \
+		--overwrite \
+		--claim-size=$(TINY_1_VOL_SIZE) \
+		-t persistentVolumeClaim \
+		--claim-name=redis-volume-1 \
+		--name=consul-volume-1
 
 os-backend-a-app-create: # create new application (backend-a)
 	oc -n $(OS_PROJECT_NAME) new-app \
@@ -131,7 +148,7 @@ os-backend-a-app-create: # create new application (backend-a)
 #	    volume $(BACKEND_A_APP) \
 #		--add \
 #		--overwrite \
-#		--claim-size='3Gi' \
+#		--claim-size=$(MEDIUM_1_VOL_SIZE) \
 #		-t persistentVolumeClaim \
 #		--name=backend-service-a
 
@@ -159,7 +176,7 @@ os-backend-b-app-create: # create new application (backend-b)
 #	    volume $(BACKEND_B_APP) \
 #		--add \
 #		--overwrite \
-#		--claim-size='3Gi' \
+#		--claim-size=$(MEDIUM_1_VOL_SIZE) \
 #		-t persistentVolumeClaim \
 #		--name=backend-service-a
 
