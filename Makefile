@@ -9,7 +9,10 @@ OS_PROJECT_NAME := openshift-spring-cloud-test
 
 PROJECT_SOURRCE := http://gitlab.apps.rgs.cinimex.ru/alice/openshift-spring-cloud-test.git
 
+BACKEND_A_APP := backend-service-a
+BACKEND_B_APP := backend-service-b
 CONSUL_APP := consul
+FRONTEND_APP := frontend-service
 REDIS_APP := redis
 SPLUNK_APP := splunk
 
@@ -19,8 +22,17 @@ list-targets:
 	@grep '^[^#[:space:]].*:[[:space:]]\+#' Makefile
 	@echo
 
+clean-back-a: # remove backend-service-a application resources
+	oc delete -l app=$(BACKEND_A_APP) all
+
+clean-back-b: # remove backend-service-b application resources
+	oc delete -l app=$(BACKEND_B_APP) all
+
 clean-consul: # remove consul application resources
 	oc delete -l app=$(CONSUL_APP) all
+
+clean-front: # remove frontend-service application resources
+	oc delete -l app=$(FRONTEND_APP) all
 
 clean-redis: # remove redis application resources
 	oc delete -l app=$(REDIS_APP) all
@@ -74,66 +86,66 @@ os-consul-app-create: # create new application (consul)
 	@echo "Please path $(CONSUL_APP) to run in privileged mode" 
 
 os-backend-a-app-create: # create new application (backend-a)
-	oc -n $(OS_PROJECT_NAME) new-app \
-	    --name backend-service-a \
+	echo oc -n $(OS_PROJECT_NAME) new-app \
+	    --name $(BACKEND_A_APP) \
 	    $(PROJECT_SOURRCE) \
 	    --context-dir=backend-service \
-	    --param=SPRING_APPLICATION_NAME=backend-service-a \
-	    --param=SPRING_CLOUD_CONSUL_HOST=172.17.0.5 \
-	    --param=LOGGING_BUSINESS_INDEX_NAME=businessoperations \
-	    --param=LOGGING_DIRECTORY=logs \
-	    --param=LOGGING_ENABLE_LOG_TO_FILE=true \
-	    --param=LOGGING_ENABLE_LOG_TO_SPLUNK=true \
-	    --param=LOGGING_ENVIRONMENT=poc \
-	    --param=LOGGING_LEVEL=INFO \
-	    --param=LOGGING_NODE=someNiceNode \
-	    --param=LOGGING_SLOWQUERY_INDEX_NAME=acme-slowquery \
-	    --param=LOGGING_SPARSE=true \
-	    --param=LOGGING_SPLUNK_HOST=\$${SPLUNK_SERVICE_HOST} \
-	    --param=LOGGING_SPLUNK_PORT=\$${SPLUNK_SERVICE_PORT} \
-	    --param=LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
-	    --param=LOGGING_TECH_INDEX_NAME=acme
+	    -e SPRING_APPLICATION_NAME=$(BACKEND_A_APP) \
+	    -e SPRING_CLOUD_CONSUL_HOST=$(CONSUL_APP) \
+	    -e LOGGING_BUSINESS_INDEX_NAME=businessoperations \
+	    -e LOGGING_DIRECTORY=logs \
+	    -e LOGGING_ENABLE_LOG_TO_FILE=true \
+	    -e LOGGING_ENABLE_LOG_TO_SPLUNK=true \
+	    -e LOGGING_ENVIRONMENT=poc \
+	    -e LOGGING_LEVEL=INFO \
+	    -e LOGGING_NODE=someNiceNode \
+	    -e LOGGING_SLOWQUERY_INDEX_NAME=acme-slowquery \
+	    -e LOGGING_SPARSE=true \
+	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
+	    -e LOGGING_SPLUNK_PORT=8088 \
+	    -e LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
+	    -e LOGGING_TECH_INDEX_NAME=acme
 
 os-backend-b-app-create: # create new application (backend-b)
-	oc -n $(OS_PROJECT_NAME) new-app \
-	    --name backend-service-b \
+	echo oc -n $(OS_PROJECT_NAME) new-app \
+	    --name $(BACKEND_B_APP) \
 	    $(PROJECT_SOURRCE) \
 	    --context-dir=backend-service \
-	    --param=SPRING_APPLICATION_NAME=backend-service-b \
-	    --param=SPRING_CLOUD_CONSUL_HOST=172.17.0.5 \
-	    --param=LOGGING_BUSINESS_INDEX_NAME=businessoperations \
-	    --param=LOGGING_DIRECTORY=logs \
-	    --param=LOGGING_ENABLE_LOG_TO_FILE=true \
-	    --param=LOGGING_ENABLE_LOG_TO_SPLUNK=true \
-	    --param=LOGGING_ENVIRONMENT=poc \
-	    --param=LOGGING_LEVEL=INFO \
-	    --param=LOGGING_NODE=someNiceNode \
-	    --param=LOGGING_SLOWQUERY_INDEX_NAME=acme-slowquery \
-	    --param=LOGGING_SPARSE=true \
-	    --param=LOGGING_SPLUNK_HOST=\$${SPLUNK_SERVICE_HOST} \
-	    --param=LOGGING_SPLUNK_PORT=\$${SPLUNK_SERVICE_PORT} \
-	    --param=LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
-	    --param=LOGGING_TECH_INDEX_NAME=acme
+	    -e SPRING_APPLICATION_NAME=$(BACKEND_B_APP) \
+	    -e SPRING_CLOUD_CONSUL_HOST=$(CONSUL_APP) \
+	    -e LOGGING_BUSINESS_INDEX_NAME=businessoperations \
+	    -e LOGGING_DIRECTORY=logs \
+	    -e LOGGING_ENABLE_LOG_TO_FILE=true \
+	    -e LOGGING_ENABLE_LOG_TO_SPLUNK=true \
+	    -e LOGGING_ENVIRONMENT=poc \
+	    -e LOGGING_LEVEL=INFO \
+	    -e LOGGING_NODE=someNiceNode \
+	    -e LOGGING_SLOWQUERY_INDEX_NAME=acme-slowquery \
+	    -e LOGGING_SPARSE=true \
+	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
+	    -e LOGGING_SPLUNK_PORT=8088 \
+	    -e LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
+	    -e LOGGING_TECH_INDEX_NAME=acme
 
 os-frontend-app-create: # create new application (frontend-b)
-	oc -n $(OS_PROJECT_NAME) new-app \
-	    --name frontend \
+	echo oc -n $(OS_PROJECT_NAME) new-app \
+	    --name $(FRONTEND_APP) \
 	    $(PROJECT_SOURRCE) \
-	    --context-dir=frontend-service \
-	    --param=SPRING_APPLICATION_NAME=fontend-service \
-	    --param=SPRING_CLOUD_CONSUL_HOST=172.17.0.5 \
-	    --param=CACHING_REDIS_HOST=172.17.0.4 \
-	    --param=CACHING_REDIS_PORT=6379 \
-	    --param=LOGGING_BUSINESS_INDEX_NAME=businessoperations \
-	    --param=LOGGING_DIRECTORY=logs \
-	    --param=LOGGING_ENABLE_LOG_TO_FILE=true \
-	    --param=LOGGING_ENABLE_LOG_TO_SPLUNK=true \
-	    --param=LOGGING_ENVIRONMENT=poc \
-	    --param=LOGGING_LEVEL=INFO \
-	    --param=LOGGING_NODE=someNiceNode \
-	    --param=LOGGING_SLOWQUERY_INDEX_NAME=acme-slowquery \
-	    --param=LOGGING_SPARSE=true \
-	    --param=LOGGING_SPLUNK_HOST=\${SPLUNK_SERVICE_HOST} \
-	    --param=LOGGING_SPLUNK_PORT=\${SPLUNK_SERVICE_PORT} \
-	    --param=LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
-	    --param=LOGGING_TECH_INDEX_NAME=acme
+	    --context-dir=backend-service \
+	    -e SPRING_APPLICATION_NAME=$(FRONTEND_APP) \
+	    -e SPRING_CLOUD_CONSUL_HOST=$(CONSUL_APP) \
+	    -e CACHING_REDIS_HOST=redis \
+	    -e CACHING_REDIS_PORT=6379 \
+	    -e LOGGING_BUSINESS_INDEX_NAME=businessoperations \
+	    -e LOGGING_DIRECTORY=logs \
+	    -e LOGGING_ENABLE_LOG_TO_FILE=true \
+	    -e LOGGING_ENABLE_LOG_TO_SPLUNK=true \
+	    -e LOGGING_ENVIRONMENT=poc \
+	    -e LOGGING_LEVEL=INFO \
+	    -e LOGGING_NODE=someNiceNode \
+	    -e LOGGING_SLOWQUERY_INDEX_NAME=acme-slowquery \
+	    -e LOGGING_SPARSE=true \
+	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
+	    -e LOGGING_SPLUNK_PORT=8088 \
+	    -e LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
+	    -e LOGGING_TECH_INDEX_NAME=acme
