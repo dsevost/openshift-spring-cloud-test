@@ -35,9 +35,11 @@ list-targets:
 
 clean-back-a: # remove backend-service-a application resources
 	oc delete -l app=$(BACKEND_A_APP) all
+	oc delete pvc -l app=$(BACKEND_A_APP)
 
 clean-back-b: # remove backend-service-b application resources
 	oc delete -l app=$(BACKEND_B_APP) all
+	oc delete pvc -l app=$(BACKEND_B_APP)
 
 clean-consul: # remove consul application resources
 	oc delete -l app=$(CONSUL_APP) all
@@ -87,6 +89,7 @@ os-splunk-app-create: # create new application (SPLUNK) based on outcoldman/splu
 		-t persistentVolumeClaim \
 		--claim-name=splunk-volume-2 \
 		--name=splunk-volume-2
+	oc label pvc splunk-volume-2 app=$(SPLUNK_APP)
 	oc expose service $(SPLUNK_APP) --port=8080 --hostname=$(SPLUNK_APP).$(APP_DOMAIN)
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@echo "Please path $(SPLUNK_APP) to run in privileged mode" 
@@ -108,6 +111,7 @@ os-redis-app-create: # create new application (redis) based on offical redis doc
 		-t persistentVolumeClaim \
 		--claim-name=redis-volume-1 \
 		--name=redis-volume-1
+	oc label pvc redis-volume-1 app=$(REDIS_APP)
 
 os-consul-app-create: # create new application (consul)
 	oc -n $(OS_PROJECT_NAME) new-app \
@@ -123,6 +127,7 @@ os-consul-app-create: # create new application (consul)
 		-t persistentVolumeClaim \
 		--claim-name=redis-volume-1 \
 		--name=consul-volume-1
+	oc label pvc consul-volume-1 app=$(CONSUL_APP)
 
 os-backend-a-app-create: # create new application (backend-a)
 	oc -n $(OS_PROJECT_NAME) new-app \
@@ -143,19 +148,24 @@ os-backend-a-app-create: # create new application (backend-a)
 	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
 	    -e LOGGING_SPLUNK_PORT=8088 \
 	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
-	    -e LOGGING_TECH_INDEX_NAME=acme
-#	oc -n $(OS_PROJECT_NAME) \
-#	    volume $(BACKEND_A_APP) \
-#		--add \
-#		--overwrite \
-#		--claim-size=$(MEDIUM_1_VOL_SIZE) \
-#		-t persistentVolumeClaim \
-#		--name=backend-service-a
+	    -e LOGGING_TECH_INDEX_NAME=acme \
+		|| grep -i 'error: imagestreams .* already exists' && /bin/true
+	oc -n $(OS_PROJECT_NAME) \
+	    volume dc/$(BACKEND_A_APP) \
+		--add \
+		--overwrite \
+		--claim-size=$(MEDIUM_1_VOL_SIZE) \
+		-t persistentVolumeClaim \
+		--mount-path=/logs \
+		--claim-name=backend-service-a-1 \
+		--name=backend-service-1
+	oc label pvc backend-service-a-1 app=$(BACKEND_A_APP)
 
 os-backend-b-app-create: # create new application (backend-b)
 	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(BACKEND_B_APP) \
 	    $(PROJECT_SOURRCE) \
+	    -i os-backend-b-app-create-dummy0 \
 	    --context-dir=backend-service \
 	    -e SPRING_APPLICATION_NAME=$(BACKEND_B_APP) \
 	    -e SPRING_CLOUD_CONSUL_HOST=$(CONSUL_APP) \
@@ -171,14 +181,18 @@ os-backend-b-app-create: # create new application (backend-b)
 	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
 	    -e LOGGING_SPLUNK_PORT=8088 \
 	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
-	    -e LOGGING_TECH_INDEX_NAME=acme
-#	oc -n $(OS_PROJECT_NAME) \
-#	    volume $(BACKEND_B_APP) \
-#		--add \
-#		--overwrite \
-#		--claim-size=$(MEDIUM_1_VOL_SIZE) \
-#		-t persistentVolumeClaim \
-#		--name=backend-service-a
+	    -e LOGGING_TECH_INDEX_NAME=acme \
+		|| { grep -i 'error: imagestreams .* already exists' && /bin/true }
+	oc -n $(OS_PROJECT_NAME) \
+	    volume dc/$(BACKEND_B_APP) \
+		--add \
+		--overwrite \
+		--claim-size=$(MEDIUM_1_VOL_SIZE) \
+		-t persistentVolumeClaim \
+		--mount-path=/logs \
+		--claim-name=backend-service-b-1 \
+		--name=backend-service-1
+	oc label pvc backend-service-b-1 app=$(BACKEND_B_APP)
 
 os-frontend-app-create: # create new application (frontend-b)
 	echo oc -n $(OS_PROJECT_NAME) new-app \
@@ -202,3 +216,13 @@ os-frontend-app-create: # create new application (frontend-b)
 	    -e LOGGING_SPLUNK_PORT=8088 \
 	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
 	    -e LOGGING_TECH_INDEX_NAME=acme
+	oc -n $(OS_PROJECT_NAME) \
+	    volume dc/$(FRONTEND_APP) \
+		--add \
+		--overwrite \
+		--claim-size=$(MEDIUM_1_VOL_SIZE) \
+		-t persistentVolumeClaim \
+		--mount-path=/logs \
+		--claim-name=frontend-service-1 \
+		--name=frontend-service-1
+	oc label pvc frontend-service-1 app=$(FRONTEND_APP)

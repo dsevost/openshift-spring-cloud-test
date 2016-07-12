@@ -26,6 +26,7 @@ CMD ["bash", "-c", "java -jar  \
  -Dlogging.splunk.port=$LOGGING_SPLUNK_PORT \
  -Dlogging.splunk.token=$LOGGING_SPLUNK_TOKEN \
  -Dlogging.tech.index.name=$LOGGING_TECH_INDEX_NAME \
+ -Dspring.cloud.consul.host=$SPRING_CLOUD_CONSUL_HOST \
  /${SERVICE_NAME}.jar"]
 
 USER root
