@@ -28,6 +28,10 @@ CMD ["bash", "-c", "java -jar  \
  -Dlogging.tech.index.name=$LOGGING_TECH_INDEX_NAME \
  /${SERVICE_NAME}.jar"]
 
+USER root
+
+VOLUME [ "/logs" ]
+
 RUN \
   mv $DEPLOY_DIR/${SERVICE_NAME}.jar / \
   && \

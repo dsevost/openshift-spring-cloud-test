@@ -30,6 +30,8 @@ CMD ["bash", "-c", "java -jar  \
 
 USER root
 
+VOLUME [ "/logs" ]
+
 RUN \
   mv $DEPLOY_DIR/${SERVICE_NAME}.jar / \
   && \

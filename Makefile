@@ -9,12 +9,15 @@ OS_PROJECT_NAME := openshift-spring-cloud-test
 
 PROJECT_SOURRCE := http://gitlab.apps.rgs.cinimex.ru/alice/openshift-spring-cloud-test.git
 
+APP_DOMAIN := apps.rgs.cinimex.ru
+
 BACKEND_A_APP := backend-service-a
 BACKEND_B_APP := backend-service-b
 CONSUL_APP := consul
 FRONTEND_APP := frontend-service
 REDIS_APP := redis
 SPLUNK_APP := splunk
+SPLUNK_TOKEN := DA044211-D1E3-45F5-8025-36311DA590C3
 
 all: list-targets
 list-targets:
@@ -63,10 +66,21 @@ os-create-project: # switch (or create) openshift project
 	oadm policy add-scc-to-user privileged system:serviceaccount:$(OS_PROJECT_NAME):default
 
 os-splunk-app-create: # create new application (SPLUNK) based on outcoldman/splunk:6.4.1 docker image
-	oc -n $(OS_PROJECT_NAME) new-app \
-	    --name $(SPLUNK_APP) \
-	    -e SPLUNK_START_ARGS="--accept-license" \
-	    outcoldman/splunk:6.4.1
+	oc -n $(OS_PROJECT_NAME) \
+	    new-app \
+		--name $(SPLUNK_APP) \
+		-e SPLUNK_START_ARGS="--accept-license" \
+	        outcoldman/splunk:6.4.1
+	oc -n $(OS_PROJECT_NAME) \
+	    volume dc/$(SPLUNK_APP) \
+		--add \
+		--overwrite \
+		--claim-size='10Gi' \
+		-t persistentVolumeClaim \
+		--name=splunk-volume-2
+
+	oc expose service $(SPLUNK_APP) --port=8080 --hostname=$(SPLUNK_APP).$(APP_DOMAIN)
+	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@echo "Please path $(SPLUNK_APP) to run in privileged mode" 
 
 os-splunk-app-indeces: # create indeces into splunk app
@@ -78,15 +92,23 @@ os-redis-app-create: # create new application (redis) based on offical redis doc
 	    --name $(REDIS_APP) \
 	    -e REDIS_START_ARGS="--appendonly yes" \
 	    corporate-docker-registry.rgs.cinimex.ru:5000/rgs/redis
+	oc -n $(OS_PROJECT_NAME) \
+	    volume dc/$(REDIS_APP) \
+		--add \
+		--overwrite \
+		--claim-size='100Mi' \
+		-t persistentVolumeClaim \
+		--name=redis-volume-1
 
 os-consul-app-create: # create new application (consul)
 	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(CONSUL_APP) \
 	    corporate-docker-registry.rgs.cinimex.ru:5000/rgs/consul
+q	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	@echo "Please path $(CONSUL_APP) to run in privileged mode" 
 
 os-backend-a-app-create: # create new application (backend-a)
-	echo oc -n $(OS_PROJECT_NAME) new-app \
+	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(BACKEND_A_APP) \
 	    $(PROJECT_SOURRCE) \
 	    --context-dir=backend-service \
@@ -103,11 +125,18 @@ os-backend-a-app-create: # create new application (backend-a)
 	    -e LOGGING_SPARSE=true \
 	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
 	    -e LOGGING_SPLUNK_PORT=8088 \
-	    -e LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
+	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
 	    -e LOGGING_TECH_INDEX_NAME=acme
+#	oc -n $(OS_PROJECT_NAME) \
+#	    volume $(BACKEND_A_APP) \
+#		--add \
+#		--overwrite \
+#		--claim-size='3Gi' \
+#		-t persistentVolumeClaim \
+#		--name=backend-service-a
 
 os-backend-b-app-create: # create new application (backend-b)
-	echo oc -n $(OS_PROJECT_NAME) new-app \
+	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(BACKEND_B_APP) \
 	    $(PROJECT_SOURRCE) \
 	    --context-dir=backend-service \
@@ -124,8 +153,15 @@ os-backend-b-app-create: # create new application (backend-b)
 	    -e LOGGING_SPARSE=true \
 	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
 	    -e LOGGING_SPLUNK_PORT=8088 \
-	    -e LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
+	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
 	    -e LOGGING_TECH_INDEX_NAME=acme
+#	oc -n $(OS_PROJECT_NAME) \
+#	    volume $(BACKEND_B_APP) \
+#		--add \
+#		--overwrite \
+#		--claim-size='3Gi' \
+#		-t persistentVolumeClaim \
+#		--name=backend-service-a
 
 os-frontend-app-create: # create new application (frontend-b)
 	echo oc -n $(OS_PROJECT_NAME) new-app \
@@ -147,5 +183,5 @@ os-frontend-app-create: # create new application (frontend-b)
 	    -e LOGGING_SPARSE=true \
 	    -e LOGGING_SPLUNK_HOST=$(SPLUNK_APP) \
 	    -e LOGGING_SPLUNK_PORT=8088 \
-	    -e LOGGING_SPLUNK_TOKEN=8B9EA553-61D8-4FCD-AB7B-9F5D6CA94345 \
+	    -e LOGGING_SPLUNK_TOKEN=$(SPLUNK_TOKEN) \
 	    -e LOGGING_TECH_INDEX_NAME=acme
