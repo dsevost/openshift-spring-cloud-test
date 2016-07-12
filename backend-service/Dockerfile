@@ -28,7 +28,11 @@ CMD ["bash", "-c", "java -jar  \
  -Dlogging.tech.index.name=$LOGGING_TECH_INDEX_NAME \
  /${SERVICE_NAME}.jar"]
 
+USER root
+
 RUN \
   mv $DEPLOY_DIR/${SERVICE_NAME}.jar / \
   && \
   rm -rf $DEPLOY_DIR/*.jar
+
+USER jboss
