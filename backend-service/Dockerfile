@@ -1,13 +1,14 @@
-FROM rgs/java
+FROM corporate-docker-registry.rgs.cinimex.ru:5000/rgs/openshift-spring-cloud-test:863315
 MAINTAINER dsevosty@redhat.com
-
-# add jar
-ADD build/backend-service.jar /
 
 # expose ports
 EXPOSE 8080
+
 #remote debugging port, shouldn't be used in production
 #EXPOSE 5005
+
+ENV \
+  SERVICE_NAME=backend-service
 
 # setup startup command
 CMD ["bash", "-c", "java -jar  \
@@ -25,4 +26,9 @@ CMD ["bash", "-c", "java -jar  \
  -Dlogging.splunk.port=$LOGGING_SPLUNK_PORT \
  -Dlogging.splunk.token=$LOGGING_SPLUNK_TOKEN \
  -Dlogging.tech.index.name=$LOGGING_TECH_INDEX_NAME \
- /backend-service.jar"]
+ /${SERVICE_NAME}.jar"]
+
+RUN \
+  mv $DEPLOY_DIR/${SERVICE_NAME}.jar / \
+  && \
+  rm -rf $DEPLOY_DIR/*.jar
