@@ -1,23 +1,23 @@
 #!/bin/bash
 
-REGISTRY := corporate-docker-registry.rgs.cinimex.ru:5000
-REGISTRY_NS := 
-IMAGE_NAME := openshift-spring-cloud-test
-RELEASE := 863315
+REGISTRY = corporate-docker-registry.rgs.cinimex.ru:5000
+REGISTRY_NS = 
+IMAGE_NAME = openshift-spring-cloud-test
+RELEASE = 863315
 
-OS_PROJECT_NAME := openshift-spring-cloud-test
+OS_PROJECT_NAME = openshift-spring-cloud-test
 
-PROJECT_SOURRCE := http://gitlab.apps.rgs.cinimex.ru/alice/openshift-spring-cloud-test.git
+PROJECT_SOURRCE = http://gitlab.apps.rgs.cinimex.ru/alice/openshift-spring-cloud-test.git
 
-APP_DOMAIN := apps.rgs.cinimex.ru
+APP_DOMAIN = apps.rgs.cinimex.ru
 
-BACKEND_A_APP := backend-service-a
-BACKEND_B_APP := backend-service-b
-CONSUL_APP := consul
-FRONTEND_APP := frontend-service
-REDIS_APP := redis
-SPLUNK_APP := splunk
-SPLUNK_TOKEN := DA044211-D1E3-45F5-8025-36311DA590C3
+BACKEND_A_APP = backend-service-a
+BACKEND_B_APP = backend-service-b
+CONSUL_APP = consul
+FRONTEND_APP = frontend-service
+REDIS_APP = redis
+SPLUNK_APP = splunk
+SPLUNK_TOKEN = DA044211-D1E3-45F5-8025-36311DA590C3
 
 TINY_1_VOL_SIZE=100Mi
 SMALL_1_VOL_SIZE=512Mi
@@ -27,8 +27,8 @@ MEDIUM_2_VOL_SIZE=6Gi
 LARGE_1_VOL_SIZE=10Gi
 LARGE_2_VOL_SIZE=20Gi
 
-all: list-targets
-list-targets:
+all: list-public-targets
+list-public-targets:
 	@echo
 	@grep '^[^#[:space:]].*:[[:space:]]\+#' Makefile
 	@echo
