@@ -103,7 +103,7 @@ os-splunk-app-indeces: # create indeces into splunk app
 	@echo "Not implemented yet"
 	@/bin/false
 
-os-redis-app-create: # create new application (redis) based on offical redis docker image
+os-redis-app-create: # create new application (redis)
 	oc -n $(OS_PROJECT_NAME) new-app \
 	    --name $(REDIS_APP) \
 	    -e REDIS_START_ARGS="--appendonly yes" \
