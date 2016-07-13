@@ -97,7 +97,7 @@ os-splunk-app-create: # create new application (SPLUNK) based on outcoldman/splu
 	oc expose service $(SPLUNK_APP) --hostname=$(SPLUNK_APP).$(APP_DOMAIN)
 	oc patch route $(SPLUNK_APP) -p '{ "spec": { "port": { "targetPort": "8000-tcp" } } }'
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	@echo "Please path $(SPLUNK_APP) to run in privileged mode" 
+	@echo "Please patch $(SPLUNK_APP) to run in privileged mode" 
 
 os-splunk-app-indeces: # create indeces into splunk app
 	@echo "Not implemented yet"
@@ -123,7 +123,7 @@ os-consul-app-create: # create new application (consul)
 	    --name $(CONSUL_APP) \
 	    corporate-docker-registry.rgs.cinimex.ru:5000/rgs/consul
 	@echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	@echo "Please path $(CONSUL_APP) to run in privileged mode" 
+	@echo "Please patch $(CONSUL_APP) to run in privileged mode" 
 	oc -n $(OS_PROJECT_NAME) \
 	    volume dc/$(CONSUL_APP) \
 		--add \
