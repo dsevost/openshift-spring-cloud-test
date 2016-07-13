@@ -1,4 +1,5 @@
-FROM corporate-docker-registry.rgs.cinimex.ru:5000/rgs/openshift-spring-cloud-test:863315
+#FROM corporate-docker-registry.rgs.cinimex.ru:5000/rgs/openshift-spring-cloud-test:863315
+FROM base-image-stream
 MAINTAINER dsevosty@redhat.com
 
 # expose ports
