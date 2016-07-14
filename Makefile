@@ -38,9 +38,9 @@ list-public-targets:
 s2i:
 	s2i \
 	    build \
-		http://gitlab.apps.rgs.cinimex.ru/alice/openshift-spring-cloud-test.git \
+		$(PROJECT_SOURRCE) \
 		rgs/springboot-s2i \
-		openshift-spring-cloud-test:base \
+		$(IMAGE_NAME):base \
 		    --incremental=true
 
 docker-tag: 					# tag just built docker image
