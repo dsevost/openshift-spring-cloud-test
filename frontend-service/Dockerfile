@@ -1,4 +1,4 @@
-FROM corporate-docker-registry.rgs.cinimex.ru:5000/rgs/openshift-spring-cloud-test:863315
+FROM base-image-stream
 MAINTAINER dsevosty@redhat.com
 
 # expose ports
@@ -36,3 +36,5 @@ RUN \
   mv $DEPLOY_DIR/${SERVICE_NAME}.jar / \
   && \
   rm -rf $DEPLOY_DIR/*.jar
+
+USER jboss
